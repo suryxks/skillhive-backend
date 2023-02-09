@@ -9,3 +9,154 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id        String @id @default(uuid())
+  email     String @unique
+  password  String
+  firstname String
+  lastname  String
+
+  CourseEnrollment     CourseEnrollment[]
+  AssignmentSubmission AssignmentSubmission[]
+  VideoComments        VideoComments[]
+  ForrumPost           ForrumPost[]
+  ForrumComment        ForrumComment[]
+  PostLike             PostLike[]
+}
+
+model Course {
+  id                   String                 @id @default(uuid())
+  created_at           DateTime
+  name                 String
+  description          String
+  CourseEnrollment     CourseEnrollment[]
+  modules              Module[]
+  videos               Video[]
+  LectureNotes         LectureNotes[]
+  Assignment           Assignment[]
+  AssignmentSubmission AssignmentSubmission[]
+  ForrumPost           ForrumPost[]
+}
+
+enum Roles {
+  STUDENT
+  TEACHER
+}
+
+model CourseEnrollment {
+  createdAt DateTime @default(now())
+  role      Roles    @default(STUDENT)
+  userId    String
+  courseId  String
+  course    Course   @relation(fields: [courseId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@id([userId, courseId])
+  @@index([userId, role])
+}
+
+model Module {
+  id           String         @id @default(uuid())
+  title        String
+  ModuleNumber Int
+  courseId     String
+  course       Course         @relation(fields: [courseId], references: [id])
+  videos       Video[]
+  LectureNotes LectureNotes[]
+  Assignment   Assignment[]
+}
+
+model Video {
+  id            String          @id @default(uuid())
+  title         String
+  courseId      String
+  moduleId      String
+  course        Course          @relation(fields: [courseId], references: [id])
+  module        Module          @relation(fields: [moduleId], references: [id])
+  VideoComments VideoComments[]
+}
+
+model LectureNotes {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  courseId    String
+  moduleId    String
+  uploadedAt  DateTime
+  course      Course   @relation(fields: [courseId], references: [id])
+  module      Module   @relation(fields: [moduleId], references: [id])
+}
+
+model Assignment {
+  id                   String                 @id @default(uuid())
+  title                String
+  description          String
+  marks                Int?
+  startTime            DateTime
+  endTime              DateTime?
+  attachment           String?
+  courseId             String
+  moduleId             String
+  course               Course                 @relation(fields: [courseId], references: [id])
+  module               Module                 @relation(fields: [moduleId], references: [id])
+  AssignmentSubmission AssignmentSubmission[]
+}
+
+enum AssignmentStatus {
+  PENDING
+  SUBMITTED
+  EVALUATED
+}
+
+model AssignmentSubmission {
+  id             String           @id @default(uuid())
+  marks          Int              @default(0)
+  submission     String
+  submissionTime DateTime
+  staus          AssignmentStatus @default(PENDING)
+  userId         String
+  assignmentId   String
+  courseId       String
+  course         Course           @relation(fields: [courseId], references: [id])
+  assignment     Assignment       @relation(fields: [assignmentId], references: [id])
+  user           User             @relation(fields: [userId], references: [id])
+}
+
+model VideoComments {
+  id       String   @id @default(uuid())
+  postedAt DateTime
+  videoId  String
+  userId   String
+  video    Video    @relation(fields: [videoId], references: [id])
+  user     User     @relation(fields: [userId], references: [id])
+}
+
+model ForrumPost {
+  id            String          @id @default(uuid())
+  postedAt      DateTime
+  authorId      String
+  courseId      String
+  user          User            @relation(fields: [authorId], references: [id])
+  course        Course          @relation(fields: [courseId], references: [id])
+  ForrumComment ForrumComment[]
+  PostLike      PostLike[]
+}
+
+model ForrumComment {
+  id       String     @id @default(uuid())
+  postedAt DateTime
+  authorId String
+  postId   String
+  user     User       @relation(fields: [authorId], references: [id])
+  post     ForrumPost @relation(fields: [postId], references: [id])
+}
+
+model PostLike {
+  postId String
+  userId String
+  user   User       @relation(fields: [userId], references: [id])
+  post   ForrumPost @relation(fields: [postId], references: [id])
+
+  @@id([postId, userId])
+}
