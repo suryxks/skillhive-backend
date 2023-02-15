@@ -26,7 +26,7 @@ async (req, res,next) => {
         res.json({
             data: {
             token:token
-        }}).status(200)
+        }}).status(201)
     } catch (error) {
         next(error)
     }
