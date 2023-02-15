@@ -1,10 +1,11 @@
 import express from 'express';
 import {errorHandler, routeNotFound} from '../src/middlewares'
-import { signupRouter } from './routers/signup.router';
+import { signupRouter,loginRouter } from './routers';
 const app = express();
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
-app.use('/signup',signupRouter)
+app.use('/signup', signupRouter)
+app.use('/login',loginRouter)
 app.use(routeNotFound)
 app.use(errorHandler)
 
