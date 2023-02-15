@@ -23,6 +23,7 @@ model User {
   ForrumPost           ForrumPost[]
   ForrumComment        ForrumComment[]
   PostLike             PostLike[]
+  VideoNotes           VideoNotes[]
 }
 
 model Course {
@@ -75,6 +76,7 @@ model Video {
   course        Course          @relation(fields: [courseId], references: [id])
   module        Module          @relation(fields: [moduleId], references: [id])
   VideoComments VideoComments[]
+  VideoNotes    VideoNotes[]
 }
 
 model LectureNotes {
@@ -130,6 +132,15 @@ model VideoComments {
   userId   String
   video    Video    @relation(fields: [videoId], references: [id])
   user     User     @relation(fields: [userId], references: [id])
+}
+
+model VideoNotes {
+  id        String @id @default(uuid())
+  videoId   String
+  userId    String
+  timeStamp String
+  video     Video  @relation(fields: [videoId], references: [id])
+  user      User   @relation(fields: [userId], references: [id])
 }
 
 model ForrumPost {
