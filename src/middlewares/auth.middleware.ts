@@ -5,6 +5,7 @@ export const auth = (req,res,next) => {
     if (token && verifyToken(token)) {
         req.user = user;
         next();
+    } else {
+        res.status(401).json({ message: 'Invalid token' })
     }
-    res.status(401).json({message:'Invalid token'})
 }

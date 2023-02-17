@@ -17,7 +17,7 @@ model User {
   firstname String
   lastname  String
 
-  courses    CourseEnrollment[]
+  courses              CourseEnrollment[]
   AssignmentSubmission AssignmentSubmission[]
   VideoComments        VideoComments[]
   ForrumPost           ForrumPost[]
@@ -27,17 +27,17 @@ model User {
 }
 
 model Course {
-  id                   String                 @id @default(uuid())
-  created_at           DateTime      @default(now())
-  name                 String
-  description          String
-  members     CourseEnrollment[]
-  modules              Module[]
-  videos               Video[]
-  lectureNotes         LectureNotes[]
+  id                    String                 @id @default(uuid())
+  created_at            DateTime               @default(now())
+  name                  String
+  description           String
+  members               CourseEnrollment[]
+  modules               Module[]
+  videos                Video[]
+  lectureNotes          LectureNotes[]
   assignments           Assignment[]
   assignmentSubmissions AssignmentSubmission[]
-  forrumPost           ForrumPost[]
+  forrumPost            ForrumPost[]
 }
 
 enum Roles {
@@ -90,16 +90,16 @@ model LectureNotes {
 }
 
 model Assignment {
-  id                   String                 @id @default(uuid())
-  title                String
-  description          String
-  marks                Int?
-  startTime            DateTime
-  endTime              DateTime?
-  attachment           String?
-  courseId             String
-  moduleId             String
-  course               Course                 @relation(fields: [courseId], references: [id])
+  id                    String                 @id @default(uuid())
+  title                 String
+  description           String
+  marks                 Int?
+  startTime             DateTime
+  endTime               DateTime?
+  attachment            String?
+  courseId              String
+  moduleId              String
+  course                Course                 @relation(fields: [courseId], references: [id])
   assignmentSubmissions AssignmentSubmission[]
 }
 
@@ -141,14 +141,14 @@ model VideoNotes {
 }
 
 model ForrumPost {
-  id            String          @id @default(uuid())
-  postedAt      DateTime
-  authorId      String
-  courseId      String
-  user          User            @relation(fields: [authorId], references: [id])
-  course        Course          @relation(fields: [courseId], references: [id])
+  id       String          @id @default(uuid())
+  postedAt DateTime
+  authorId String
+  courseId String
+  user     User            @relation(fields: [authorId], references: [id])
+  course   Course          @relation(fields: [courseId], references: [id])
   comments ForrumComment[]
-  likes      PostLike[]
+  likes    PostLike[]
 }
 
 model ForrumComment {
