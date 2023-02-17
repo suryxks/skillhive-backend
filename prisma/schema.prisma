@@ -17,7 +17,7 @@ model User {
   firstname String
   lastname  String
 
-  CourseEnrollment     CourseEnrollment[]
+  courses    CourseEnrollment[]
   AssignmentSubmission AssignmentSubmission[]
   VideoComments        VideoComments[]
   ForrumPost           ForrumPost[]
@@ -28,16 +28,16 @@ model User {
 
 model Course {
   id                   String                 @id @default(uuid())
-  created_at           DateTime
+  created_at           DateTime      @default(now())
   name                 String
   description          String
-  CourseEnrollment     CourseEnrollment[]
+  members     CourseEnrollment[]
   modules              Module[]
   videos               Video[]
-  LectureNotes         LectureNotes[]
-  Assignment           Assignment[]
-  AssignmentSubmission AssignmentSubmission[]
-  ForrumPost           ForrumPost[]
+  lectureNotes         LectureNotes[]
+  assignments           Assignment[]
+  assignmentSubmissions AssignmentSubmission[]
+  forrumPost           ForrumPost[]
 }
 
 enum Roles {
@@ -64,8 +64,7 @@ model Module {
   courseId     String
   course       Course         @relation(fields: [courseId], references: [id])
   videos       Video[]
-  LectureNotes LectureNotes[]
-  Assignment   Assignment[]
+  lectureNotes LectureNotes[]
 }
 
 model Video {
@@ -75,8 +74,8 @@ model Video {
   moduleId      String
   course        Course          @relation(fields: [courseId], references: [id])
   module        Module          @relation(fields: [moduleId], references: [id])
-  VideoComments VideoComments[]
-  VideoNotes    VideoNotes[]
+  videoComments VideoComments[]
+  videoNotes    VideoNotes[]
 }
 
 model LectureNotes {
@@ -101,12 +100,10 @@ model Assignment {
   courseId             String
   moduleId             String
   course               Course                 @relation(fields: [courseId], references: [id])
-  module               Module                 @relation(fields: [moduleId], references: [id])
-  AssignmentSubmission AssignmentSubmission[]
+  assignmentSubmissions AssignmentSubmission[]
 }
 
 enum AssignmentStatus {
-  PENDING
   SUBMITTED
   EVALUATED
 }
@@ -116,7 +113,7 @@ model AssignmentSubmission {
   marks          Int              @default(0)
   submission     String
   submissionTime DateTime
-  staus          AssignmentStatus @default(PENDING)
+  staus          AssignmentStatus @default(SUBMITTED)
   userId         String
   assignmentId   String
   courseId       String
@@ -150,8 +147,8 @@ model ForrumPost {
   courseId      String
   user          User            @relation(fields: [authorId], references: [id])
   course        Course          @relation(fields: [courseId], references: [id])
-  ForrumComment ForrumComment[]
-  PostLike      PostLike[]
+  comments ForrumComment[]
+  likes      PostLike[]
 }
 
 model ForrumComment {
