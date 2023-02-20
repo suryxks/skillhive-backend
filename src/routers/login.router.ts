@@ -26,7 +26,7 @@ router.get(
               res.status(401).json({ message: 'Unothorised access' })
           }
           const token = createJwt(user);
-          res.status(200).json({data:{token:token}})
+          res.status(200).json({data:{token:token,user:user}})
       } else {
         res.status(404).json({message:'user not found'})
       }
