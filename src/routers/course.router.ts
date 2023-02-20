@@ -135,25 +135,75 @@ router.post(
           },
         },
       });
-        res.status(201).json({data:{assignment:assignment}})
+      res.status(201).json({ data: { assignment: assignment } });
     } catch (error) {
       console.error(error);
     }
   }
 );
 router.get(
+  "/assignments/:assignmentId",
+  param("assignmentId"),
+  handleInputErrors,
+  async (req, res) => {
+    const { assignmentId } = req.params;
+    try {
+      const assignment = await prisma.assignment.findUnique({
+        where: {
+          id: assignmentId,
+        },
+      });
+      res.status(200).json({ data: { assignment: assignment } });
+    } catch (error) {
+      console.error(error);
+    }
+  }
+);
+router.post(
+  "/assignments/:assignmentId",
+  param("assignmentId"),
+  body("title").isString(),
+  body("description").isString(),
+  body("startTime").isDate().optional(),
+  body("endTime").isDate().optional(),
+  body("marks").isNumeric().optional(),
+  handleInputErrors,
+  async (req, res) => {
+    const { assignmentId } = req.params;
+    const { title, description, startTime, endTime, marks } = req.body;
+    try {
+      const assignment = await prisma.assignment.update({
+        where: {
+          id: assignmentId,
+        },
+        data: {
+          title: title,
+          description: description,
+          marks: marks ? marks : null,
+          startTime: startTime,
+          endTime: endTime ? endTime : null,
+        },
+      });
+      res.status(200).json({ data: { assignment: assignment } });
+    } catch (error) {
+      console.error(error);
+    }
+  }
+);
+
+router.delete(
     "/assignments/:assignmentId",
     param("assignmentId"),
     handleInputErrors,
     async (req, res) => {
       const { assignmentId } = req.params;
-        try {
-            const assignment = await prisma.assignment.findUnique({
-                where: {
-                   id:assignmentId
-               }
-           })
-       res.status(200).json({data:{assignment:assignment}})
+      try {
+         await prisma.assignment.delete({
+          where: {
+            id: assignmentId,
+          },
+        });
+        res.status(204);
       } catch (error) {
         console.error(error);
       }
