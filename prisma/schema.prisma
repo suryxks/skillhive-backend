@@ -17,7 +17,7 @@ model User {
   firstname String
   lastname  String
 
-  CourseEnrollment     CourseEnrollment[]
+  courses              CourseEnrollment[]
   AssignmentSubmission AssignmentSubmission[]
   VideoComments        VideoComments[]
   ForrumPost           ForrumPost[]
@@ -27,17 +27,17 @@ model User {
 }
 
 model Course {
-  id                   String                 @id @default(uuid())
-  created_at           DateTime
-  name                 String
-  description          String
-  CourseEnrollment     CourseEnrollment[]
-  modules              Module[]
-  videos               Video[]
-  LectureNotes         LectureNotes[]
-  Assignment           Assignment[]
-  AssignmentSubmission AssignmentSubmission[]
-  ForrumPost           ForrumPost[]
+  id                    String                 @id @default(uuid())
+  created_at            DateTime               @default(now())
+  name                  String
+  description           String
+  members               CourseEnrollment[]
+  modules               Module[]
+  videos                Video[]
+  lectureNotes          LectureNotes[]
+  assignments           Assignment[]
+  assignmentSubmissions AssignmentSubmission[]
+  forrumPost            ForrumPost[]
 }
 
 enum Roles {
@@ -64,8 +64,7 @@ model Module {
   courseId     String
   course       Course         @relation(fields: [courseId], references: [id])
   videos       Video[]
-  LectureNotes LectureNotes[]
-  Assignment   Assignment[]
+  lectureNotes LectureNotes[]
 }
 
 model Video {
@@ -75,8 +74,8 @@ model Video {
   moduleId      String
   course        Course          @relation(fields: [courseId], references: [id])
   module        Module          @relation(fields: [moduleId], references: [id])
-  VideoComments VideoComments[]
-  VideoNotes    VideoNotes[]
+  videoComments VideoComments[]
+  videoNotes    VideoNotes[]
 }
 
 model LectureNotes {
@@ -91,22 +90,20 @@ model LectureNotes {
 }
 
 model Assignment {
-  id                   String                 @id @default(uuid())
-  title                String
-  description          String
-  marks                Int?
-  startTime            DateTime
-  endTime              DateTime?
-  attachment           String?
-  courseId             String
-  moduleId             String
-  course               Course                 @relation(fields: [courseId], references: [id])
-  module               Module                 @relation(fields: [moduleId], references: [id])
-  AssignmentSubmission AssignmentSubmission[]
+  id                    String                 @id @default(uuid())
+  title                 String
+  description           String
+  marks                 Int?
+  startTime             DateTime
+  endTime               DateTime?
+  attachment            String?
+  courseId              String
+  moduleId              String
+  course                Course                 @relation(fields: [courseId], references: [id])
+  assignmentSubmissions AssignmentSubmission[]
 }
 
 enum AssignmentStatus {
-  PENDING
   SUBMITTED
   EVALUATED
 }
@@ -116,7 +113,7 @@ model AssignmentSubmission {
   marks          Int              @default(0)
   submission     String
   submissionTime DateTime
-  staus          AssignmentStatus @default(PENDING)
+  staus          AssignmentStatus @default(SUBMITTED)
   userId         String
   assignmentId   String
   courseId       String
@@ -144,14 +141,14 @@ model VideoNotes {
 }
 
 model ForrumPost {
-  id            String          @id @default(uuid())
-  postedAt      DateTime
-  authorId      String
-  courseId      String
-  user          User            @relation(fields: [authorId], references: [id])
-  course        Course          @relation(fields: [courseId], references: [id])
-  ForrumComment ForrumComment[]
-  PostLike      PostLike[]
+  id       String          @id @default(uuid())
+  postedAt DateTime
+  authorId String
+  courseId String
+  user     User            @relation(fields: [authorId], references: [id])
+  course   Course          @relation(fields: [courseId], references: [id])
+  comments ForrumComment[]
+  likes    PostLike[]
 }
 
 model ForrumComment {
