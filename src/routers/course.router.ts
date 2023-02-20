@@ -141,4 +141,22 @@ router.post(
     }
   }
 );
+router.get(
+    "/assignments/:assignmentId",
+    param("assignmentId"),
+    handleInputErrors,
+    async (req, res) => {
+      const { assignmentId } = req.params;
+        try {
+            const assignment = await prisma.assignment.findUnique({
+                where: {
+                   id:assignmentId
+               }
+           })
+       res.status(200).json({data:{assignment:assignment}})
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  );
 export { router as courseRouter };
