@@ -94,11 +94,10 @@ model Assignment {
   title                 String
   description           String
   marks                 Int?
-  startTime             DateTime
+  startTime             DateTime               @default(now())
   endTime               DateTime?
   attachment            String?
   courseId              String
-  moduleId              String
   course                Course                 @relation(fields: [courseId], references: [id])
   assignmentSubmissions AssignmentSubmission[]
 }
