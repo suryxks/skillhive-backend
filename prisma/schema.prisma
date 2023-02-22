@@ -60,7 +60,7 @@ model CourseEnrollment {
 model Module {
   id           String         @id @default(uuid())
   title        String
-  ModuleNumber Int
+  ModuleNumber Int            @unique @default(autoincrement())
   courseId     String
   course       Course         @relation(fields: [courseId], references: [id])
   videos       Video[]
@@ -84,7 +84,7 @@ model LectureNotes {
   description String?
   courseId    String
   moduleId    String
-  uploadedAt  DateTime
+  uploadedAt  DateTime @default(now())
   course      Course   @relation(fields: [courseId], references: [id])
   module      Module   @relation(fields: [moduleId], references: [id])
 }
@@ -111,7 +111,7 @@ model AssignmentSubmission {
   id             String           @id @default(uuid())
   marks          Int              @default(0)
   submission     String
-  submissionTime DateTime
+  submissionTime DateTime         @default(now())
   staus          AssignmentStatus @default(SUBMITTED)
   userId         String
   assignmentId   String
@@ -123,7 +123,7 @@ model AssignmentSubmission {
 
 model VideoComments {
   id       String   @id @default(uuid())
-  postedAt DateTime
+  postedAt DateTime @default(now())
   videoId  String
   userId   String
   video    Video    @relation(fields: [videoId], references: [id])
@@ -141,7 +141,7 @@ model VideoNotes {
 
 model ForrumPost {
   id       String          @id @default(uuid())
-  postedAt DateTime
+  postedAt DateTime        @default(now())
   authorId String
   courseId String
   user     User            @relation(fields: [authorId], references: [id])
@@ -152,7 +152,7 @@ model ForrumPost {
 
 model ForrumComment {
   id       String     @id @default(uuid())
-  postedAt DateTime
+  postedAt DateTime   @default(now())
   authorId String
   postId   String
   user     User       @relation(fields: [authorId], references: [id])
