@@ -192,21 +192,64 @@ router.post(
 );
 
 router.delete(
-    "/assignments/:assignmentId",
-    param("assignmentId"),
-    handleInputErrors,
-    async (req, res) => {
-      const { assignmentId } = req.params;
-      try {
-         await prisma.assignment.delete({
-          where: {
-            id: assignmentId,
-          },
-        });
-        res.status(204);
-      } catch (error) {
-        console.error(error);
-      }
+  "/assignments/:assignmentId",
+  param("assignmentId"),
+  handleInputErrors,
+  async (req, res) => {
+    const { assignmentId } = req.params;
+    try {
+      await prisma.assignment.delete({
+        where: {
+          id: assignmentId,
+        },
+      });
+      res.status(204);
+    } catch (error) {
+      console.error(error);
     }
-  );
+  }
+);
+
+//modules
+
+router.post(
+  "/:courseId/modules",
+  param("courseId"),
+  body("title"),
+  handleInputErrors,
+  async (req, res) => {
+    const { courseId } = req.params;
+    const { title } = req.body;
+    try {
+      const module = await prisma.module.create({
+        data: {
+          title: title,
+          course: {
+            connect: {
+              id: courseId,
+            },
+          },
+        },
+        select: {
+          course: {
+            select: {
+              name: true,
+              id: true,
+              modules: true,
+                },
+            },
+            videos: true,
+            lectureNotes:true,
+        },
+      });
+      res.status(201).json({
+        data: {
+          module: module,
+        },
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  }
+);
 export { router as courseRouter };
