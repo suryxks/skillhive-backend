@@ -144,6 +144,8 @@ model ForrumPost {
   postedAt DateTime        @default(now())
   authorId String
   courseId String
+  title    String
+  content  String
   user     User            @relation(fields: [authorId], references: [id])
   course   Course          @relation(fields: [courseId], references: [id])
   comments ForrumComment[]
@@ -155,6 +157,7 @@ model ForrumComment {
   postedAt DateTime   @default(now())
   authorId String
   postId   String
+  content  String
   user     User       @relation(fields: [authorId], references: [id])
   post     ForrumPost @relation(fields: [postId], references: [id])
 }
