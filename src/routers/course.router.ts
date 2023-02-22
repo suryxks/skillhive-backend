@@ -252,4 +252,37 @@ router.post(
     }
   }
 );
+router.get(
+    "/modules/:moduleId",
+    param("moduleId"),
+    handleInputErrors,
+    async (req, res) => {
+      const { moduleId } = req.params;
+      try {
+        const module = await prisma.module.findUnique({
+          where: {
+          id:moduleId
+          },
+          select: {
+            course: {
+              select: {
+                name: true,
+                id: true,
+                modules: true,
+                  },
+              },
+              videos: true,
+              lectureNotes:true,
+          },
+        });
+        res.status(201).json({
+          data: {
+            module: module,
+          },
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  );
 export { router as courseRouter };
