@@ -285,4 +285,83 @@ router.get(
       }
     }
   );
+
+
+  //Forrum posts for a course
+
+//create a post
+router.post('/:courseId/posts',
+    param('courseId'),
+    body('userId'),
+    body('title'),
+    body('content'),
+    handleInputErrors,
+    async (req, res) => {
+        const { courseId } = req.params;
+        const { userId, title, content } = req.body;
+        try {
+            const post = await prisma.forrumPost.create({
+                data: {
+                    title: title,
+                    content: content,
+                    user: {
+                        connect: {
+                            id:userId,
+                        }
+                    },
+                    course: {
+                        connect: {
+                            id:courseId
+                        }
+                    }
+                },
+                include: {
+                    user: {
+                        select: {
+                            id: true,
+                            firstname: true,
+                            lastname:true,
+                        }
+                    }
+                }
+            })
+            res.status(201).json({
+                data: {
+                post:post
+            }})
+        } catch (error) {
+            console.error(error)
+        }
+    }
+)
+router.post('/:courseId/posts',
+    param('courseId'),
+    handleInputErrors,
+    async (req, res) => {
+        const { courseId } = req.params;
+        try {
+            const posts = await prisma.forrumPost.findMany({
+                
+                select: {
+                    title: true,
+                    content: true,
+                    id:true,
+                    user: {
+                        select: {
+                            id: true,
+                            firstname: true,
+                            lastname:true,
+                        }
+                    }
+                }
+            })
+            res.status(200).json({
+                data: {
+                posts:posts
+            }})
+        } catch (error) {
+            console.error(error)
+        }
+    }
+)
 export { router as courseRouter };
