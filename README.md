@@ -3,4 +3,5 @@
 
 # db diagram
 
-![skillhive](https://user-images.githubusercontent.com/71174744/218160860-c10f5474-1e31-4221-9a81-f990c3ad2990.png)
+![skillhive _new](https://user-images.githubusercontent.com/71174744/220915250-f65e20f4-265c-4fbf-8d53-b4a252336096.png)
+
