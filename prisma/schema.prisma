@@ -72,6 +72,7 @@ model Video {
   title         String
   courseId      String
   moduleId      String
+  videoUrl      String
   course        Course          @relation(fields: [courseId], references: [id])
   module        Module          @relation(fields: [moduleId], references: [id])
   videoComments VideoComments[]
@@ -84,6 +85,7 @@ model LectureNotes {
   description String?
   courseId    String
   moduleId    String
+  notesUrl    String
   uploadedAt  DateTime @default(now())
   course      Course   @relation(fields: [courseId], references: [id])
   module      Module   @relation(fields: [moduleId], references: [id])
@@ -114,6 +116,7 @@ model AssignmentSubmission {
   submissionTime DateTime         @default(now())
   staus          AssignmentStatus @default(SUBMITTED)
   userId         String
+  submissionUrl  String
   assignmentId   String
   courseId       String
   course         Course           @relation(fields: [courseId], references: [id])

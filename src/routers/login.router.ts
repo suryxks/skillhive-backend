@@ -20,12 +20,15 @@ router.get(
         },
       });
       if (user) {
+        //const {password:hashedPassword}=user
         const { password: hashedPassword } = user;
           const isPasswordCorrect = await comparePassword(password, hashedPassword);
           if (!isPasswordCorrect) {
               res.status(401).json({ message: 'Unothorised access' })
           }
-          const token = createJwt(user);
+        const token = createJwt(user); 
+
+        // delete user.password;
           res.status(200).json({data:{token:token,user:user}})
       } else {
         res.status(404).json({message:'user not found'})

@@ -23,9 +23,11 @@ async (req, res,next) => {
             }
         })
         const token = createJwt(user);
+        delete user.password
         res.json({
             data: {
-            token:token
+                token: token,
+                user:user,
         }}).status(201)
     } catch (error) {
         next(error)
