@@ -1,61 +1,22 @@
 import express from "express";
-import prisma from "../db";
 import { body, param } from "express-validator";
 import { handleInputErrors } from "../middlewares";
-
+import {
+  getUsers,
+  getUserData,
+  updateUser,
+  deleteUser,
+  enrollInCourse
+} from "../handlers/users";
 const router = express.Router();
 
-router.get("/", async (req, res) => {
-  try {
-    const users = await prisma.user.findMany({
-      select: {
-        email: true,
-        firstname: true,
-        lastname: true,
-        courses: {
-          select: {
-            course: {
-              select: {
-                name: true,
-                id: true,
-              },
-            },
-          },
-        },
-      },
-    });
-    res.status(200).json({ data: { users: users } });
-  } catch (error) {
-    console.error(error);
-  }
-});
-router.get("/:userId", param("userId"), handleInputErrors, async (req, res) => {
-  const { userId } = req.params;
-  try {
-    const user = await prisma.user.findUnique({
-      where: {
-        id: userId,
-      },
-      select: {
-        email: true,
-        firstname: true,
-        lastname: true,
-        courses: {
-          select: {
-            course: {
-              select: {
-                name: true,
-              },
-            },
-          },
-        },
-      },
-    });
-    res.status(200).json({ data: { user: user } });
-  } catch (error) {
-    console.error(error);
-  }
-});
+//get all users
+router.get("/", getUsers);
+
+//get detials of the given user based on the user ID
+router.get("/:userId", param("userId"), handleInputErrors, getUserData);
+
+//update user data
 router.post(
   "/:userId",
   param("userId"),
@@ -63,99 +24,18 @@ router.post(
   body("lastname"),
   body("email"),
   handleInputErrors,
-  async (req, res) => {
-    const { userId } = req.params;
-    const { firstname, lastname, email } = req.body;
-    try {
-      const user = await prisma.user.update({
-        where: {
-          id: userId,
-        },
-        data: {
-          firstname: firstname,
-          lastname: lastname,
-          email: email,
-        },
-        select: {
-          email: true,
-          firstname: true,
-          lastname: true,
-          courses: {
-            select: {
-              course: {
-                select: {
-                  name: true,
-                },
-              },
-            },
-          },
-        },
-      });
-      res.status(200).json({ data: { user: user } });
-    } catch (error) {
-      console.error(error);
-    }
-  }
+  updateUser
 );
-router.delete(
-  "/:userId",
-  param("userId"),
-  handleInputErrors,
-  async (req, res) => {
-    const { userId } = req.params;
-    try {
-      await prisma.user.delete({
-        where: {
-          id: userId,
-        },
-      });
-      res.status(204).json({ data: { message: "user deleted" } });
-    } catch (error) {
-      console.error(error);
-    }
-  }
-);
+
+//delete user from db
+router.delete("/:userId", param("userId"), handleInputErrors, deleteUser);
+
+//enroll user in a course
 router.post(
   "/:userId/courses/:courseId",
   param("userId"),
   param("courseId"),
   handleInputErrors,
-  async (req, res) => {
-    const { userId, courseId } = req.params;
-    try {
-      const user = await prisma.user.update({
-        where: {
-          id: userId,
-        },
-        data: {
-          courses: {
-            connect: {
-              userId_courseId: {
-                userId: userId,
-                courseId: courseId,
-              },
-            },
-          },
-        },
-        select: {
-          email: true,
-          firstname: true,
-          lastname: true,
-          courses: {
-            select: {
-              course: {
-                select: {
-                  name: true,
-                },
-              },
-            },
-          },
-        },
-      });
-      res.status(200).json({ data: { user: user } });
-    } catch (error) {
-      console.error(error);
-    }
-  }
+  enrollInCourse
 );
 export { router as userRouter };
