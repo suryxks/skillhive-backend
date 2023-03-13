@@ -2,111 +2,57 @@ import express from "express";
 import prisma from "../db";
 import { body, param } from "express-validator";
 import { handleInputErrors } from "../middlewares";
-
+import {
+  createAssignment,
+  createCourse,
+  deleteCourse,
+  editAssignmentDetails,
+  getAssignmentDetails,
+  getCourseDetails,
+  updateCourseDetails,
+  deleteAssignment,
+  createModule,
+  createPost,
+  getPosts,
+  getPostDetails,
+  getModuleDetails,
+  createComment,
+} from "../handlers/course";
 const router = express.Router();
-
+// create a course
 router.post(
   "/",
   body("userId").isString(),
   body("name").isString(),
   body("description").isString(),
   handleInputErrors,
-  async (req, res) => {
-    const { name, description, userId } = req.body;
-    try {
-      const course = await prisma.course.create({
-        data: {
-          name: name,
-          description: description,
-          members: {
-            create: {
-              role: "TEACHER",
-              user: {
-                connect: {
-                  id: userId,
-                },
-              },
-            },
-          },
-        },
-      });
-      res.status(201).json({ data: course });
-    } catch (error) {
-      console.error(error);
-    }
-  }
+  createCourse
 );
+
+//get course details for the given course Id
 router.get(
   "/:courseId",
   param("courseId"),
   handleInputErrors,
-  async (req, res) => {
-    const { courseId } = req.params;
-    try {
-      const course = await prisma.course.findUnique({
-        where: {
-          id: courseId,
-        },
-      });
-      res.status(200).json({ data: { course } });
-    } catch (error) {
-      console.error(error);
-    }
-  }
+  getCourseDetails
 );
+
+//   update course details
 router.post(
   "/:courseId",
   param("courseId"),
   body("name").isString(),
   body("description").isString(),
   handleInputErrors,
-  async (req, res) => {
-    const { courseId } = req.params;
-    const { name, description } = req.body;
-    try {
-      const course = await prisma.course.update({
-        where: {
-          id: courseId,
-        },
-        data: {
-          name: name,
-          description: description,
-        },
-      });
-      res.status(200).json({ data: course });
-    } catch (error) {
-      console.error(error);
-    }
-  }
+  updateCourseDetails
 );
 
-router.delete(
-  "/:courseId",
-  param("courseId"),
-  handleInputErrors,
-  async (req, res) => {
-    const { courseId } = req.params;
-    try {
-      await prisma.$transaction([
-        prisma.courseEnrollment.deleteMany({
-          where: {
-            courseId: courseId,
-          },
-        }),
-        prisma.course.delete({
-          where: {
-            id: courseId,
-          },
-        }),
-      ]);
-      res.status(204);
-    } catch (error) {
-      console.error(error);
-    }
-  }
-);
+//delete course and unenroll all from the course
+router.delete("/:courseId", param("courseId"), handleInputErrors, deleteCourse);
 
-//assignments
+//ASSIGNMENTS
+
+// create an assignment
 
 router.post(
   "/:courseId/assignments",
@@ -117,48 +63,18 @@ router.post(
   body("endTime").isDate().optional(),
   body("marks").isNumeric().optional(),
   handleInputErrors,
-  async (req, res) => {
-    const { courseId } = req.params;
-    const { title, description, startTime, endTime, marks } = req.body;
-    try {
-      const assignment = await prisma.assignment.create({
-        data: {
-          title: title,
-          description: description,
-          marks: marks ? marks : null,
-          startTime: startTime,
-          endTime: endTime ? endTime : null,
-          course: {
-            connect: {
-              id: courseId,
-            },
-          },
-        },
-      });
-      res.status(201).json({ data: { assignment: assignment } });
-    } catch (error) {
-      console.error(error);
-    }
-  }
+  createAssignment
 );
+
+// get assignment details
 router.get(
   "/assignments/:assignmentId",
   param("assignmentId"),
   handleInputErrors,
-  async (req, res) => {
-    const { assignmentId } = req.params;
-    try {
-      const assignment = await prisma.assignment.findUnique({
-        where: {
-          id: assignmentId,
-        },
-      });
-      res.status(200).json({ data: { assignment: assignment } });
-    } catch (error) {
-      console.error(error);
-    }
-  }
+  getAssignmentDetails
 );
+
+// edit assignment details
 router.post(
   "/assignments/:assignmentId",
   param("assignmentId"),
@@ -168,114 +84,34 @@ router.post(
   body("endTime").isDate().optional(),
   body("marks").isNumeric().optional(),
   handleInputErrors,
-  async (req, res) => {
-    const { assignmentId } = req.params;
-    const { title, description, startTime, endTime, marks } = req.body;
-    try {
-      const assignment = await prisma.assignment.update({
-        where: {
-          id: assignmentId,
-        },
-        data: {
-          title: title,
-          description: description,
-          marks: marks ? marks : null,
-          startTime: startTime,
-          endTime: endTime ? endTime : null,
-        },
-      });
-      res.status(200).json({ data: { assignment: assignment } });
-    } catch (error) {
-      console.error(error);
-    }
-  }
+  editAssignmentDetails
 );
 
+//delete assignment
 router.delete(
   "/assignments/:assignmentId",
   param("assignmentId"),
   handleInputErrors,
-  async (req, res) => {
-    const { assignmentId } = req.params;
-    try {
-      await prisma.assignment.delete({
-        where: {
-          id: assignmentId,
-        },
-      });
-      res.status(204);
-    } catch (error) {
-      console.error(error);
-    }
-  }
+  deleteAssignment
 );
 
-//modules
+//MODULES
 
+//create a module
 router.post(
   "/:courseId/modules",
   param("courseId"),
   body("title"),
   handleInputErrors,
-  async (req, res) => {
-    const { courseId } = req.params;
-    const { title } = req.body;
-    try {
-      const module = await prisma.module.create({
-        data: {
-          title: title,
-          course: {
-            connect: {
-              id: courseId,
-            },
-          },
-        },
-        select: {
-          course: {
-            select: {
-              name: true,
-              id: true,
-              modules: true,
-            },
-          },
-          videos: true,
-          lectureNotes: true,
-        },
-      });
-      res.status(201).json({ data: { module: module } });
-    } catch (error) {
-      console.error(error);
-    }
-  }
+  createModule
 );
+
+// get module details for the given module id
 router.get(
   "/modules/:moduleId",
   param("moduleId"),
   handleInputErrors,
-  async (req, res) => {
-    const { moduleId } = req.params;
-    try {
-      const module = await prisma.module.findUnique({
-        where: {
-          id: moduleId,
-        },
-        select: {
-          course: {
-            select: {
-              name: true,
-              id: true,
-              modules: true,
-            },
-          },
-          videos: true,
-          lectureNotes: true,
-        },
-      });
-      res.status(201).json({ data: { module: module } });
-    } catch (error) {
-      console.error(error);
-    }
-  }
+  getModuleDetails
 );
 
 //Forrum posts for a course
@@ -288,71 +124,16 @@ router.post(
   body("title"),
   body("content"),
   handleInputErrors,
-  async (req, res) => {
-    const { courseId } = req.params;
-    const { userId, title, content } = req.body;
-    try {
-      const post = await prisma.forrumPost.create({
-        data: {
-          title: title,
-          content: content,
-          user: {
-            connect: {
-              id: userId,
-            },
-          },
-          course: {
-            connect: {
-              id: courseId,
-            },
-          },
-        },
-        include: {
-          user: {
-            select: {
-              id: true,
-              firstname: true,
-              lastname: true,
-            },
-          },
-        },
-      });
-      res.status(201).json({ data: { post: post } });
-    } catch (error) {
-      console.error(error);
-    }
-  }
+  createPost
 );
+
+
 //get all posts related to a course
 router.post(
   "/:courseId/posts",
   param("courseId"),
   handleInputErrors,
-  async (req, res) => {
-    const { courseId } = req.params;
-    try {
-      const posts = await prisma.forrumPost.findMany({
-        where: {
-          course: courseId,
-        },
-        select: {
-          title: true,
-          content: true,
-          id: true,
-          user: {
-            select: {
-              id: true,
-              firstname: true,
-              lastname: true,
-            },
-          },
-        },
-      });
-      res.status(200).json({ data: { posts: posts } });
-    } catch (error) {
-      console.error(error);
-    }
-  }
+  getPosts
 );
 
 //get everything related to a post
@@ -362,74 +143,17 @@ router.get(
   param("courseId"),
   param("postId"),
   handleInputErrors,
-  async (req, res) => {
-    const { courseId, postId } = req.params;
-    try {
-      const post = await prisma.forrumPost.findUnique({
-        where: {
-          id: postId,
-        },
-        select: {
-          title: true,
-          content: true,
-          comments: true,
-          likes: true,
-          user: {
-            select: {
-              firstname: true,
-              lastname: true,
-              id: true,
-            },
-          },
-        },
-      });
-      res.status(200).json({ data: { post: post } });
-    } catch (error) {
-      console.error(error);
-    }
-  }
+  getPostDetails
 );
+
+// comment on a post
 router.post(
-    "/:courseId/posts/:postId/comments",
-    param("courseId"),
-    param("postId"),
-    body('userId'),
-    body('content'),
-    handleInputErrors,
-    async (req, res) => {
-        const { courseId, postId } = req.params;
-        const {content,userId}=req.body
-      try {
-        const post = await prisma.forrumComment.create({
-          data: {
-                content: content,
-                user: {
-                    connect: {
-                        id:userId
-                    }
-                },
-                post: {
-                    connect: {
-                        id:postId
-                    }
-                }
-          },
-          select: {
-            content: true,
-            user: {
-              select: {
-                firstname: true,
-                lastname: true,
-                id: true,
-              },
-              },
-            post:true,
-          },
-        });
-        res.status(201).json({ data: { post: post } });
-      } catch (error) {
-        console.error(error);
-      }
-    }
-  );
+  "/:courseId/posts/:postId/comments",
+  param("courseId"),
+  param("postId"),
+  body("userId"),
+  body("content"),
+  handleInputErrors,
+  createComment
+);
 export { router as courseRouter };

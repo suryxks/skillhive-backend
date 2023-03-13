@@ -129,6 +129,7 @@ model VideoComments {
   postedAt DateTime @default(now())
   videoId  String
   userId   String
+  content  String
   video    Video    @relation(fields: [videoId], references: [id])
   user     User     @relation(fields: [userId], references: [id])
 }
@@ -138,21 +139,24 @@ model VideoNotes {
   videoId   String
   userId    String
   timeStamp String
+  title     String
+  content   String
   video     Video  @relation(fields: [videoId], references: [id])
   user      User   @relation(fields: [userId], references: [id])
 }
 
 model ForrumPost {
-  id       String          @id @default(uuid())
-  postedAt DateTime        @default(now())
-  authorId String
-  courseId String
-  title    String
-  content  String
-  user     User            @relation(fields: [authorId], references: [id])
-  course   Course          @relation(fields: [courseId], references: [id])
-  comments ForrumComment[]
-  likes    PostLike[]
+  id         String          @id @default(uuid())
+  postedAt   DateTime        @default(now())
+  authorId   String
+  courseId   String
+  title      String
+  content    String
+  attachment String?
+  user       User            @relation(fields: [authorId], references: [id])
+  course     Course          @relation(fields: [courseId], references: [id])
+  comments   ForrumComment[]
+  likes      PostLike[]
 }
 
 model ForrumComment {
