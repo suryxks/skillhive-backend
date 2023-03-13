@@ -18,7 +18,7 @@ export const getUsers = async (req, res) => {
         },
       },
     });
-    res.status(200).json({ data: { users: users } });
+    res.status(200).json({ users});
   } catch (error) {
     console.error(error);
   }

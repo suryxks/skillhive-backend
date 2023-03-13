@@ -31,7 +31,7 @@ export const enrollInCourse = async (req, res) => {
           },
         },
       });
-      res.status(200).json({ data: { user: user } });
+      res.status(200).json({ user });
     } catch (error) {
       console.error(error);
     }
