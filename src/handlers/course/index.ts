@@ -1,3 +1,5 @@
+export { uploadNotes } from './uploadNotes';
+export { uploadVideo } from './uploadVideo';
 export { createComment } from './createComment';
 export { getPostDetails } from './getPostDetails';
 export { getPosts } from './getPosts';
@@ -12,5 +14,3 @@ export { updateCourseDetails } from './updateCourseDetails';
 export { getCourseDetails } from './getCourseDetails';
 export { createCourse } from './createCourse';
 export { deleteCourse } from './deleteCourse';
-
-
