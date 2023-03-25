@@ -1,5 +1,4 @@
 import express from "express";
-import prisma from "../db";
 import { body, param } from "express-validator";
 import { handleInputErrors } from "../middlewares";
 import {
@@ -17,6 +16,8 @@ import {
   getPostDetails,
   getModuleDetails,
   createComment,
+  uploadVideo,
+  uploadNotes
 } from "../handlers/course";
 const router = express.Router();
 // create a course
@@ -29,7 +30,6 @@ router.post(
   createCourse
 );
 
-//get course details for the given course Id
 router.get(
   "/:courseId",
   param("courseId"),
@@ -58,6 +58,7 @@ router.post(
   "/:courseId/assignments",
   param("courseId"),
   body("title").isString(),
+  body("attachment").isString().optional(),
   body("description").isString(),
   body("startTime").isDate().optional(),
   body("endTime").isDate().optional(),
@@ -108,12 +109,25 @@ router.post(
 
 // get module details for the given module id
 router.get(
-  "/modules/:moduleId",
+  "/:courseId/modules/:moduleId",
   param("moduleId"),
   handleInputErrors,
   getModuleDetails
 );
 
+router.post("/:courseId/modules/:moduleId/vidoes",
+  body("videoUrl").isString(),
+  body('title').isString(),
+  handleInputErrors,
+  uploadVideo
+)
+
+router.post("/:courseId/modules/:moduleId/videos",
+  body("notesUrl").isString(),
+  body("title").isString(),
+  handleInputErrors,
+  uploadNotes,
+ )
 //Forrum posts for a course
 
 //create a post

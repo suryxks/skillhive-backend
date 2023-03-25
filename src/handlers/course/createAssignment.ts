@@ -1,12 +1,13 @@
 import prisma from "../../db";
 export const createAssignment=async (req, res) => {
     const { courseId } = req.params;
-    const { title, description, startTime, endTime, marks } = req.body;
+    const { title, description, startTime, endTime, marks,attachment } = req.body;
     try {
       const assignment = await prisma.assignment.create({
         data: {
           title: title,
           description: description,
+          attachment:attachment?attachment:null,
           marks: marks ? marks : null,
           startTime: startTime,
           endTime: endTime ? endTime : null,
