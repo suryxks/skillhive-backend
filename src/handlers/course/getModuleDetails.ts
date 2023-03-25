@@ -19,7 +19,7 @@ export const getModuleDetails=async (req, res) => {
           lectureNotes: true,
         },
       });
-      res.status(201).json({ module });
+      res.status(200).json({ module });
     } catch (error) {
       console.error(error);
     }
