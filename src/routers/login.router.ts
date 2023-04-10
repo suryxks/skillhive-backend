@@ -6,7 +6,7 @@ import { handleInputErrors } from "../middlewares/";
 
 const router = express.Router();
 
-router.get(
+router.post(
   "/",
   body("email").isEmail(),
   body("password").isString().isLength({ min: 8, max: 11 }),
