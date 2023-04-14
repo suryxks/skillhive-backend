@@ -18,24 +18,40 @@ router.post(
         where: {
           email: email,
         },
+        select: {
+          firstname: true,
+          lastname: true,
+          email: true,
+          password:true,
+          courses: {
+            select: {
+              role: true,
+              courseId: true,
+              course: true,
+            },
+          },
+        },
       });
       if (user) {
         //const {password:hashedPassword}=user
         const { password: hashedPassword } = user;
-          const isPasswordCorrect = await comparePassword(password, hashedPassword);
-          if (!isPasswordCorrect) {
-              res.status(401).json({ message: 'Unothorised access' })
-          }
-        const token = createJwt(user); 
+        const isPasswordCorrect = await comparePassword(
+          password,
+          hashedPassword
+        );
+        if (!isPasswordCorrect) {
+          res.status(401).json({ message: "Unothorised access" });
+        }
+        const token = createJwt(user);
 
         // delete user.password;
-          res.status(200).json({data:{token:token,user:user}})
+        res.status(200).json({ token, user} );
       } else {
-        res.status(404).json({message:'user not found'})
+        res.status(404).json({ message: "user not found" });
       }
     } catch (error) {
       next(error);
     }
   }
 );
-export {router as loginRouter}
+export { router as loginRouter };
