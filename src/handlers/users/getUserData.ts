@@ -12,11 +12,9 @@ export const getUserData = async (req, res) => {
           lastname: true,
           courses: {
             select: {
-              course: {
-                select: {
-                  name: true,
-                },
-              },
+              role: true,
+              courseId: true,
+              course:true,
             },
           },
         },
