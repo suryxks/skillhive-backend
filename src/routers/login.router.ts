@@ -44,7 +44,7 @@ router.post(
         }
         const token = createJwt(user);
 
-        // delete user.password;
+        delete user.password;
         res.status(200).json({ token, user} );
       } else {
         res.status(404).json({ message: "user not found" });
