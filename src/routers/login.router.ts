@@ -19,6 +19,7 @@ router.post(
           email: email,
         },
         select: {
+          id:true,
           firstname: true,
           lastname: true,
           email: true,
